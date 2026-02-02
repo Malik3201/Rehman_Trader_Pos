@@ -6,48 +6,15 @@ This backend implements a complete sales and ledger management system with atomi
 
 ## Environment Variables
 
-Create a `.env` file in the `backend` directory with the following variables:
+**Important:** Copy `temp.env` to `.env` and fill in your actual values.
 
-```env
-# Server Configuration
-NODE_ENV=development
-PORT=5000
+See `temp.env` file for all required environment variables.
 
-# Database
-MONGO_URI=mongodb://localhost:27017/rehman_trader_pos
+**Required Variables:**
+- `MONGO_URI` - MongoDB connection string
+- `JWT_SECRET` - Secret key for JWT tokens (min 32 characters)
 
-# JWT Authentication
-JWT_SECRET=your-super-secret-jwt-key-change-in-production
-JWT_EXPIRES_IN=1d
-
-# CORS
-CORS_ORIGIN=http://localhost:5173
-
-# Admin Registration Control
-ALLOW_INITIAL_ADMIN_REGISTER=true
-
-# Shop Information (for invoices)
-SHOP_NAME=Rehman Trader
-SHOP_ADDRESS=Your Shop Address, City, Country
-SHOP_PHONE=+92-XXX-XXXXXXX
-SHOP_EMAIL=info@rehmantrader.com
-
-# OCR Configuration
-ENABLE_OCR=false
-OCR_PROVIDER=tesseract
-OCR_API_KEY=
-
-# AI Provider Configuration (for receipt parsing)
-AI_PROVIDER=groq
-AI_API_KEY=
-GROQ_API_KEY=
-GEMINI_API_KEY=
-LONGCAT_API_KEY=
-
-# File Upload Configuration
-UPLOAD_DIR=./uploads
-MAX_FILE_SIZE=5242880
-```
+See `temp.env` for complete list of all environment variables.
 
 ## Installation
 
@@ -322,11 +289,12 @@ Returns: {
 
 The system supports multiple AI providers for receipt parsing:
 
-- **Groq**: Set `AI_PROVIDER=groq` and `GROQ_API_KEY=your_key`
-- **Gemini**: Set `AI_PROVIDER=gemini` and `GEMINI_API_KEY=your_key`
-- **LongCat**: Set `AI_PROVIDER=longcat` and `LONGCAT_API_KEY=your_key`
+- **Groq** (Recommended)
+- **LongCat**
 
 **Development Mode**: If no API key is configured, the system uses mock data for testing.
+
+See `temp.env` for all configuration options and required environment variables.
 
 ### OCR Configuration
 

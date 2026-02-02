@@ -17,10 +17,9 @@ const env = {
   OCR_PROVIDER: process.env.OCR_PROVIDER || null,
   OCR_API_KEY: process.env.OCR_API_KEY || null,
   // AI Provider Configuration
-  AI_PROVIDER: process.env.AI_PROVIDER || 'groq', // groq, gemini, longcat
+  AI_PROVIDER: process.env.AI_PROVIDER || 'groq', // groq, longcat
   AI_API_KEY: process.env.AI_API_KEY || null,
   GROQ_API_KEY: process.env.GROQ_API_KEY || null,
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY || null,
   LONGCAT_API_KEY: process.env.LONGCAT_API_KEY || null,
   // File upload configuration
   UPLOAD_DIR: process.env.UPLOAD_DIR || './uploads',

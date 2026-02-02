@@ -36,12 +36,10 @@ async function parseReceiptText(rawText) {
   switch (provider) {
     case 'groq':
       return await parseWithGroq(rawText, apiKey);
-    case 'gemini':
-      return await parseWithGemini(rawText, apiKey);
     case 'longcat':
       return await parseWithLongCat(rawText, apiKey);
     default:
-      const err = new Error(`Unsupported AI provider: ${provider}`);
+      const err = new Error(`Unsupported AI provider: ${provider}. Only 'groq' and 'longcat' are supported.`);
       err.statusCode = 400;
       err.errorCode = 'UNSUPPORTED_AI_PROVIDER';
       throw err;
@@ -52,8 +50,6 @@ function getApiKeyForProvider(provider) {
   switch (provider) {
     case 'groq':
       return env.GROQ_API_KEY || env.AI_API_KEY;
-    case 'gemini':
-      return env.GEMINI_API_KEY || env.AI_API_KEY;
     case 'longcat':
       return env.LONGCAT_API_KEY || env.AI_API_KEY;
     default:
@@ -106,54 +102,6 @@ async function parseWithGroq(rawText, apiKey) {
     return JSON.parse(content);
   } catch (error) {
     logger.error('Error parsing with Groq', error);
-    throw error;
-  }
-}
-
-/**
- * Parse with Google Gemini API
- */
-async function parseWithGemini(rawText, apiKey) {
-  const prompt = buildPrompt(rawText);
-
-  try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: `You are a receipt parsing assistant. Extract structured data from receipt text and return ONLY valid JSON, no markdown, no explanations.\n\n${prompt}`,
-              },
-            ],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.1,
-          responseMimeType: 'application/json',
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      logger.error('Gemini API error', { status: response.status, error: errorText });
-      throw new Error(`Gemini API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.candidates[0]?.content?.parts[0]?.text;
-    if (!content) {
-      throw new Error('No content in Gemini response');
-    }
-
-    return JSON.parse(content);
-  } catch (error) {
-    logger.error('Error parsing with Gemini', error);
     throw error;
   }
 }
