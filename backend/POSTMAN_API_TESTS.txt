@@ -1,0 +1,411 @@
+================================================================================
+REHMAN TRADER POS - POSTMAN API TESTING GUIDE
+================================================================================
+
+BASE URL: http://localhost:5000/api/v1
+
+IMPORTANT: Replace {TOKEN} with your JWT token from login response
+IMPORTANT: Replace {ID} placeholders with actual IDs from your database
+
+================================================================================
+1. AUTHENTICATION
+================================================================================
+
+1.1 Register Admin (First Time Only)
+-------------------------------------
+POST {{BASE_URL}}/auth/register-admin
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "phone": "03001234567",
+  "password": "admin123",
+  "role": "admin"
+}
+
+Response: { success: true, data: { user, token } }
+
+
+1.2 Login
+---------
+POST {{BASE_URL}}/auth/login
+Content-Type: application/json
+
+{
+  "phone": "03001234567",
+  "password": "admin123"
+}
+
+Response: { success: true, data: { user, token } }
+→ Save the token for subsequent requests
+
+
+1.3 Get Current User
+--------------------
+GET {{BASE_URL}}/auth/me
+Authorization: Bearer {TOKEN}
+
+Response: { success: true, data: { user } }
+
+
+================================================================================
+2. HEALTH CHECK
+================================================================================
+
+GET {{BASE_URL}}/health
+
+Response: { success: true, message: "OK" }
+
+
+================================================================================
+3. PRODUCTS (Placeholder - Implement CRUD)
+================================================================================
+
+GET {{BASE_URL}}/products
+Authorization: Bearer {TOKEN}
+
+
+================================================================================
+4. CUSTOMERS
+================================================================================
+
+4.1 Get Customer Ledger
+-----------------------
+GET {{BASE_URL}}/customers/{CUSTOMER_ID}/ledger?from=2024-01-01&to=2024-12-31
+Authorization: Bearer {TOKEN}
+
+Response: { success: true, data: [ledger entries with running balance] }
+
+
+================================================================================
+5. SALES
+================================================================================
+
+5.1 Create Retail Sale
+-----------------------
+POST {{BASE_URL}}/sales/retail
+Authorization: Bearer {TOKEN}
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "productId": "{PRODUCT_ID}",
+      "qty": 5
+    }
+  ],
+  "paymentReceived": 1000,
+  "paymentMethod": "cash",
+  "discount": 0,
+  "notes": "Walk-in customer"
+}
+
+Response: { success: true, data: { sale } }
+
+
+5.2 Create Wholesale Sale
+--------------------------
+POST {{BASE_URL}}/sales/wholesale
+Authorization: Bearer {TOKEN}
+Content-Type: application/json
+
+{
+  "customerId": "{CUSTOMER_ID}",
+  "items": [
+    {
+      "productId": "{PRODUCT_ID}",
+      "qty": 10,
+      "unitPrice": 25.50
+    }
+  ],
+  "paymentReceived": 200,
+  "paymentMethod": "cash",
+  "discount": 0,
+  "notes": "Wholesale sale"
+}
+
+Response: { success: true, data: { sale } }
+
+
+5.3 Get Sales List
+-------------------
+GET {{BASE_URL}}/sales?type=wholesale&from=2024-01-01&to=2024-12-31&customerId={CUSTOMER_ID}&page=1&limit=20
+Authorization: Bearer {TOKEN}
+
+Query Parameters:
+- type: "retail" | "wholesale" (optional)
+- from: YYYY-MM-DD (optional)
+- to: YYYY-MM-DD (optional)
+- customerId: string (optional)
+- page: number (optional, default: 1)
+- limit: number (optional, default: 20)
+
+Response: { success: true, data: { sales: [], pagination: {} } }
+
+
+5.4 Get Sale by ID
+-------------------
+GET {{BASE_URL}}/sales/{SALE_ID}
+Authorization: Bearer {TOKEN}
+
+Response: { success: true, data: { sale } }
+
+
+5.5 Get Invoice PDF (Wholesale Only)
+--------------------------------------
+GET {{BASE_URL}}/sales/{SALE_ID}/invoice.pdf
+Authorization: Bearer {TOKEN}
+
+Response: PDF file download
+
+
+5.6 Get WhatsApp Share Link
+----------------------------
+GET {{BASE_URL}}/sales/{SALE_ID}/share
+Authorization: Bearer {TOKEN}
+
+Response: {
+  success: true,
+  data: {
+    pdfUrl: "http://localhost:5000/api/v1/sales/{SALE_ID}/invoice.pdf",
+    whatsappLink: "https://wa.me/923001234567?text=...",
+    messageText: "Invoice message...",
+    customerPhone: "+923001234567"
+  }
+}
+
+
+================================================================================
+6. PAYMENTS
+================================================================================
+
+6.1 Create Standalone Payment
+------------------------------
+POST {{BASE_URL}}/payments
+Authorization: Bearer {TOKEN}
+Content-Type: application/json
+
+{
+  "customerId": "{CUSTOMER_ID}",
+  "amount": 500,
+  "method": "cash",
+  "note": "Payment for previous balance"
+}
+
+Response: { success: true, data: { payment } }
+
+
+================================================================================
+7. STOCK MANAGEMENT
+================================================================================
+
+7.1 Adjust Stock (Admin Only)
+------------------------------
+POST {{BASE_URL}}/stock/adjust
+Authorization: Bearer {TOKEN} (Admin role required)
+Content-Type: application/json
+
+{
+  "productId": "{PRODUCT_ID}",
+  "qtyChange": 10,
+  "reason": "Manual adjustment - found extra stock"
+}
+
+Note: qtyChange can be positive (increase) or negative (decrease)
+Response: { success: true, data: { productId, previousStock, newStock, qtyChange } }
+
+
+================================================================================
+8. REPORTS
+================================================================================
+
+8.1 Get Daily Summary
+----------------------
+GET {{BASE_URL}}/reports/daily?date=2024-01-15
+Authorization: Bearer {TOKEN}
+
+Query Parameters:
+- date: YYYY-MM-DD (optional, defaults to today)
+
+Response: {
+  success: true,
+  data: {
+    date: "2024-01-15",
+    totalRetailSales: 5000,
+    totalWholesaleSales: 10000,
+    totalCashReceived: 8000,
+    totalCreditAdded: 2000,
+    topSellingItems: [
+      { productId: "...", name: "Product A", qty: 50 }
+    ]
+  }
+}
+
+
+================================================================================
+9. PURCHASES
+================================================================================
+
+9.1 Import Purchase from Receipt/Invoice (Admin Only)
+-------------------------------------------------------
+POST {{BASE_URL}}/purchases/import
+Authorization: Bearer {TOKEN} (Admin role required)
+Content-Type: multipart/form-data
+
+Body (form-data):
+- image: [Select File] (JPEG, PNG, WebP)
+
+Response: { success: true, data: { purchaseDraft } }
+
+Note: This creates a draft that needs approval
+
+
+9.2 Get Purchases List
+-----------------------
+GET {{BASE_URL}}/purchases?from=2024-01-01&to=2024-12-31&page=1&limit=20
+Authorization: Bearer {TOKEN}
+
+Query Parameters:
+- from: YYYY-MM-DD (optional)
+- to: YYYY-MM-DD (optional)
+- page: number (optional, default: 1)
+- limit: number (optional, default: 20)
+
+Response: { success: true, data: { purchases: [], pagination: {} } }
+
+
+9.3 Get Purchase by ID
+------------------------
+GET {{BASE_URL}}/purchases/{PURCHASE_ID}
+Authorization: Bearer {TOKEN}
+
+Response: { success: true, data: { purchase } }
+
+
+================================================================================
+10. PURCHASE DRAFTS (OCR Import Approval)
+================================================================================
+
+10.1 Get Purchase Drafts List
+------------------------------
+GET {{BASE_URL}}/purchases/drafts?status=draft&page=1&limit=20
+Authorization: Bearer {TOKEN}
+
+Query Parameters:
+- status: "draft" | "approved" | "rejected" (optional)
+- page: number (optional, default: 1)
+- limit: number (optional, default: 20)
+
+Response: { success: true, data: { drafts: [], pagination: {} } }
+
+
+10.2 Get Purchase Draft by ID
+------------------------------
+GET {{BASE_URL}}/purchases/drafts/{DRAFT_ID}
+Authorization: Bearer {TOKEN}
+
+Response: { success: true, data: { draft with items and pending products } }
+
+
+10.3 Approve Purchase Draft (Admin Only)
+-----------------------------------------
+POST {{BASE_URL}}/purchases/drafts/{DRAFT_ID}/approve
+Authorization: Bearer {TOKEN} (Admin role required)
+Content-Type: application/json
+
+{
+  "mappingDecisions": [
+    {
+      "action": "use_existing",
+      "productId": "{PRODUCT_ID}"
+    },
+    {
+      "action": "create_new",
+      "productFields": {
+        "name": "New Product",
+        "unitType": "pcs",
+        "costPrice": 25.50,
+        "retailPrice": 35.00,
+        "wholesalePrice": 30.00
+      }
+    },
+    {
+      "action": "merge_pending",
+      "pendingProductId": "{PENDING_PRODUCT_ID}",
+      "productId": "{EXISTING_PRODUCT_ID}"
+    }
+  ]
+}
+
+Actions:
+- "use_existing": Use existing product (provide productId)
+- "create_new": Create new product (provide productFields)
+- "merge_pending": Merge pending product into existing (provide both IDs)
+
+Response: { success: true, data: { purchase } }
+
+
+================================================================================
+11. SUPPLIERS (Placeholder - Implement CRUD)
+================================================================================
+
+GET {{BASE_URL}}/suppliers
+Authorization: Bearer {TOKEN}
+
+
+================================================================================
+TESTING WORKFLOW
+================================================================================
+
+1. Start with Health Check
+2. Register Admin (first time) or Login
+3. Save the JWT token
+4. Create Products, Customers, Suppliers (via placeholders or direct DB)
+5. Test Retail Sale
+6. Test Wholesale Sale
+7. Test Payment
+8. Test Stock Adjustment
+9. Test Daily Report
+10. Test Purchase Import (upload receipt image)
+11. Review Draft and Approve
+12. Test Customer Ledger
+13. Test Invoice PDF Download
+14. Test WhatsApp Share Link
+
+
+================================================================================
+ERROR RESPONSES
+================================================================================
+
+All errors follow this format:
+{
+  "success": false,
+  "message": "Error message",
+  "errorCode": "ERROR_CODE",
+  "details": { ... }
+}
+
+Common Error Codes:
+- AUTH_REQUIRED: Missing or invalid token
+- FORBIDDEN: Insufficient permissions
+- VALIDATION_ERROR: Request validation failed
+- PRODUCT_NOT_FOUND: Product doesn't exist
+- CUSTOMER_NOT_FOUND: Customer doesn't exist
+- INSUFFICIENT_STOCK: Not enough stock available
+- OCR_NOT_CONFIGURED: OCR not enabled
+- AI_PROVIDER_NOT_CONFIGURED: AI provider not set up
+
+
+================================================================================
+NOTES
+================================================================================
+
+- All dates should be in YYYY-MM-DD format
+- All monetary values are numbers (not strings)
+- JWT tokens expire after 1 day (configurable)
+- Admin-only endpoints require role: "admin"
+- File uploads (receipt images) max size: 5MB
+- OCR/AI features require environment configuration
+- WhatsApp share generates links but does NOT send messages automatically
+
+================================================================================

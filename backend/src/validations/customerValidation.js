@@ -1,4 +1,4 @@
-const { z } = require('zod');
+import { z } from 'zod';
 
 const getCustomerLedgerSchema = z.object({
   params: z.object({
@@ -10,6 +10,4 @@ const getCustomerLedgerSchema = z.object({
   }),
 });
 
-module.exports = {
-  getCustomerLedgerSchema,
-};
+export { getCustomerLedgerSchema };

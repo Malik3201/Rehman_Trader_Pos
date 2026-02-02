@@ -1,4 +1,4 @@
-const { z } = require('zod');
+import { z } from 'zod';
 
 const getPurchaseDraftsSchema = z.object({
   query: z.object({
@@ -40,7 +40,7 @@ const approvePurchaseDraftSchema = z.object({
   }),
 });
 
-module.exports = {
+export {
   getPurchaseDraftsSchema,
   getPurchaseDraftByIdSchema,
   approvePurchaseDraftSchema,

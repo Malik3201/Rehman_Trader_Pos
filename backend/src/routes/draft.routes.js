@@ -1,16 +1,16 @@
-const express = require('express');
-const { validate } = require('../middlewares/validate');
-const { authRequired, requireRole } = require('../middlewares/auth');
-const {
+import express from 'express';
+import { validate } from '../middlewares/validate.js';
+import { authRequired, requireRole } from '../middlewares/auth.js';
+import {
   getPurchaseDraftsSchema,
   getPurchaseDraftByIdSchema,
   approvePurchaseDraftSchema,
-} = require('../validations/draftValidation');
-const {
+} from '../validations/draftValidation.js';
+import {
   getPurchaseDraftsHandler,
   getPurchaseDraftByIdHandler,
   approvePurchaseDraftHandler,
-} = require('../controllers/draftController');
+} from '../controllers/draftController.js';
 
 const router = express.Router();
 
@@ -29,4 +29,4 @@ router.post(
   approvePurchaseDraftHandler
 );
 
-module.exports = router;
+export default router;

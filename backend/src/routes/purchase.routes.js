@@ -1,11 +1,11 @@
-const express = require('express');
-const { validate } = require('../middlewares/validate');
-const { authRequired, requireRole } = require('../middlewares/auth');
-const { upload, validateUploadedFile } = require('../middlewares/upload');
-const { importPurchaseSchema } = require('../validations/purchaseImportValidation');
-const { getPurchasesSchema, getPurchaseByIdSchema } = require('../validations/purchaseValidation');
-const { importPurchaseHandler } = require('../controllers/purchaseImportController');
-const { getPurchasesHandler, getPurchaseByIdHandler } = require('../controllers/purchaseController');
+import express from 'express';
+import { validate } from '../middlewares/validate.js';
+import { authRequired, requireRole } from '../middlewares/auth.js';
+import { upload, validateUploadedFile } from '../middlewares/upload.js';
+import { importPurchaseSchema } from '../validations/purchaseImportValidation.js';
+import { getPurchasesSchema, getPurchaseByIdSchema } from '../validations/purchaseValidation.js';
+import { importPurchaseHandler } from '../controllers/purchaseImportController.js';
+import { getPurchasesHandler, getPurchaseByIdHandler } from '../controllers/purchaseController.js';
 
 const router = express.Router();
 
@@ -26,4 +26,4 @@ router.get('/', authRequired, validate(getPurchasesSchema), getPurchasesHandler)
 // Get purchase by ID
 router.get('/:id', authRequired, validate(getPurchaseByIdSchema), getPurchaseByIdHandler);
 
-module.exports = router;
+export default router;

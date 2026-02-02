@@ -1,22 +1,22 @@
-const express = require('express');
-const { validate } = require('../middlewares/validate');
-const { authRequired } = require('../middlewares/auth');
-const {
+import express from 'express';
+import { validate } from '../middlewares/validate.js';
+import { authRequired } from '../middlewares/auth.js';
+import {
   retailSaleSchema,
   wholesaleSaleSchema,
   getSalesSchema,
   getSaleByIdSchema,
   getInvoicePdfSchema,
   getWhatsAppShareSchema,
-} = require('../validations/salesValidation');
-const {
+} from '../validations/salesValidation.js';
+import {
   createRetailSaleHandler,
   createWholesaleSaleHandler,
   getSalesHandler,
   getSaleByIdHandler,
   getInvoicePdfHandler,
-} = require('../controllers/salesController');
-const { getWhatsAppShareHandler } = require('../controllers/whatsappShareController');
+} from '../controllers/salesController.js';
+import { getWhatsAppShareHandler } from '../controllers/whatsappShareController.js';
 
 const router = express.Router();
 
@@ -38,4 +38,4 @@ router.get('/:id/invoice.pdf', authRequired, validate(getInvoicePdfSchema), getI
 // Get WhatsApp share link
 router.get('/:id/share', authRequired, validate(getWhatsAppShareSchema), getWhatsAppShareHandler);
 
-module.exports = router;
+export default router;

@@ -1,12 +1,12 @@
-const express = require('express');
-const { validate } = require('../middlewares/validate');
-const { authRequired } = require('../middlewares/auth');
-const { getCustomerLedgerSchema } = require('../validations/customerValidation');
-const { getCustomerLedgerHandler } = require('../controllers/customerController');
+import express from 'express';
+import { validate } from '../middlewares/validate.js';
+import { authRequired } from '../middlewares/auth.js';
+import { getCustomerLedgerSchema } from '../validations/customerValidation.js';
+import { getCustomerLedgerHandler } from '../controllers/customerController.js';
 
 const router = express.Router();
 
 // Get customer ledger
 router.get('/:id/ledger', authRequired, validate(getCustomerLedgerSchema), getCustomerLedgerHandler);
 
-module.exports = router;
+export default router;

@@ -1,4 +1,4 @@
-const { z } = require('zod');
+import { z } from 'zod';
 
 const getDailySummarySchema = z.object({
   query: z.object({
@@ -6,6 +6,4 @@ const getDailySummarySchema = z.object({
   }),
 });
 
-module.exports = {
-  getDailySummarySchema,
-};
+export { getDailySummarySchema };

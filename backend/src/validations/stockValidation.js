@@ -10,6 +10,4 @@ const adjustStockSchema = z.object({
   }),
 });
 
-module.exports = {
-  adjustStockSchema,
-};
+export { adjustStockSchema };
